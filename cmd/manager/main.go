@@ -39,7 +39,6 @@ import (
 	"k8s.io/klog/v2/klogr"
 	"open-cluster-management.io/addon-framework/pkg/addonfactory"
 	"open-cluster-management.io/addon-framework/pkg/addonmanager"
-	"open-cluster-management.io/addon-framework/pkg/agent"
 	addonclient "open-cluster-management.io/api/client/addon/clientset/versioned"
 	authv1alpha1 "open-cluster-management.io/managed-serviceaccount/api/v1alpha1"
 	"open-cluster-management.io/managed-serviceaccount/pkg/addon/manager"
@@ -66,7 +65,7 @@ func main() {
 	var enableLeaderElection bool
 	var probeAddr string
 	var addonAgentImageName string
-	var agentInstallAll bool
+	//	var agentInstallAll bool
 	var imagePullSecretName string
 	var featureGatesFlags map[string]bool
 
@@ -80,10 +79,10 @@ func main() {
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
-	flag.BoolVar(
-		&agentInstallAll, "agent-install-all", false,
-		"Configure the install strategy of agent on managed clusters. "+
-			"Enabling this will automatically install agent on all managed cluster.")
+	//	flag.BoolVar(
+	//		&agentInstallAll, "agent-install-all", false,
+	//		"Configure the install strategy of agent on managed clusters. "+
+	//			"Enabling this will automatically install agent on all managed cluster.")
 	flag.Var(
 		cliflag.NewMapStringBool(&featureGatesFlags),
 		"feature-gates",
@@ -175,19 +174,23 @@ func main() {
 	}
 
 	agentFactory := addonfactory.NewAgentAddonFactory(common.AddonName, manager.FS, "manifests/templates").
-		WithConfigGVRs(addonfactory.AddOnDeploymentConfigGVR).
+		WithConfigGVRs(addonfactory.AddOnHubConfigGVR, addonfactory.AddOnDeploymentConfigGVR).
 		WithGetValuesFuncs(
 			manager.GetDefaultValues(addonAgentImageName, imagePullSecret),
 			addonfactory.GetAddOnDeloymentConfigValues(
 				addonfactory.NewAddOnDeloymentConfigGetter(addonClient),
 				addonfactory.ToAddOnDeloymentConfigValues,
 			),
+			//			addonfactory.GetAddOnHubConfigValues(
+			//				addonfactory.NewAddOnHubConfigGetter(addonClient),
+			//				addonfactory.ToAddOnHubConfigValues,
+			//			),
 		).
 		WithAgentRegistrationOption(manager.NewRegistrationOption(nativeClient))
 
-	if agentInstallAll {
-		agentFactory.WithInstallStrategy(agent.InstallAllStrategy(common.AddonAgentInstallNamespace))
-	}
+		//	if agentInstallAll {
+		//		agentFactory.WithInstallStrategy(agent.InstallAllStrategy(common.AddonAgentInstallNamespace))
+		//	}
 
 	agentAddOn, err := agentFactory.BuildTemplateAgentAddon()
 	if err != nil {
