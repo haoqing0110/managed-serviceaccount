@@ -25,6 +25,13 @@ rules:
       - clustermanagementaddons/finalizers
     verbs:
       - update
+#  - apiGroups:
+#      - addon.open-cluster-management.io
+#    resources:
+#      - clustermanagementaddons/status
+#    verbs:
+#      - update
+#      - patch
   - apiGroups:
       - addon.open-cluster-management.io
     resources:

@@ -1,6 +1,6 @@
 # Image of the managed service-account instances
-image: quay.io/open-cluster-management/managed-serviceaccount
-tag:
+image: quay.io/haoqing/managed-serviceaccount
+tag: latest
 agentInstallAll: true
 
 # Number of replicas
