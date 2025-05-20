@@ -49,6 +49,7 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
+	hack/update-codegen.sh
 
 fmt: ## Run go fmt against code.
 	go fmt ./...
@@ -124,14 +125,3 @@ test-integration:
 
 test-e2e: build-e2e
 	./bin/e2e --test-cluster $(E2E_TEST_CLUSTER_NAME) $(GENKGO_ARGS)
-
-client-gen:
-	go install k8s.io/code-generator/cmd/client-gen@v0.29.2
-	client-gen --go-header-file hack/boilerplate.go.txt --clientset-name versioned \
-		--output-base ./_output/gen \
-		--output-package open-cluster-management.io/managed-serviceaccount/pkg/generated/clientset \
-		--input-base open-cluster-management.io/managed-serviceaccount/apis \
-		--input authentication/v1alpha1,authentication/v1beta1
-	rm -rf pkg/generated/clientset/versioned
-	mv _output/gen/open-cluster-management.io/managed-serviceaccount/pkg/generated/clientset/versioned pkg/generated/clientset/versioned
-	rm -rf _output/gen
